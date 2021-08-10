@@ -1,0 +1,72 @@
+#version 450
+
+
+struct Vertex{
+    vec3 xyz;
+    vec3 rgb;
+};
+
+struct Adjacency{
+    int neighbors[8];
+};
+
+layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer input_buffer{
+    Vertex input_data[];
+};
+
+layout(std430, binding = 1) buffer output_buffer{
+    Vertex output_data[];
+};
+
+layout(std430, binding = 2) buffer graph_buffer{
+    Adjacency adj[];
+};
+
+
+
+void main()
+{
+    uint x = gl_GlobalInvocationID.x;
+    uint y = gl_GlobalInvocationID.y;
+    Vertex v = input_data[x];
+    v.rgb.x += 0.01;
+    if(v.rgb.x > 1.f){
+        v.rgb.x -= 1.f;
+    }
+    output_data[x] = v;
+    bool peaking = false;
+    Vertex self = input_data[x];
+    Vertex next = self;
+    for(int n = 0; n < 8; n++){
+        Vertex neighbor = input_data[adj[x].neighbors[n]];
+        if(neighbor.rgb.x > 0.7){
+            peaking = true;
+        }
+    }
+    if(self.rgb.x > 0.7){
+        peaking = true;
+    }
+    if(peaking && self.rgb.x > 0.2){
+        next.rgb.x += 0.03;
+    } else {
+        if(x == 0){
+            next.rgb.x += 0.002;
+        } else {
+            next.rgb.x += 0.0005;
+        }
+    }
+
+    if(next.rgb.x > 1){
+        next.rgb.x = 0;
+    }
+    if(next.rgb.x > 0.7){
+        next.rgb.y = 1;
+    } else {
+        next.rgb.y = 0;
+    }
+
+    output_data[x] = next;
+}
+
