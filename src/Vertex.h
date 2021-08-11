@@ -21,7 +21,6 @@ struct SpecilizationData {
 
 struct Vertex {
     alignas(16) glm::vec3 pos;
-    alignas(16) glm::vec3 color;
 
     static vk::VertexInputBindingDescription binding_description() {
         VkVertexInputBindingDescription binding_description{
@@ -32,8 +31,8 @@ struct Vertex {
         return binding_description;
     }
 
-    static std::array<vk::VertexInputAttributeDescription, 2> attribute_descriptions(){
-        std::array<vk::VertexInputAttributeDescription, 2> attribute_descriptions{
+    static std::array<vk::VertexInputAttributeDescription, 1> attribute_descriptions(){
+        std::array<vk::VertexInputAttributeDescription, 1> attribute_descriptions{
             {
                 vk::VertexInputAttributeDescription(
                     0,
@@ -41,12 +40,6 @@ struct Vertex {
                     vk::Format::eR32G32B32A32Sfloat,
                     offsetof(Vertex, pos)
                 ),
-                vk::VertexInputAttributeDescription(
-                    1,
-                    0,
-                    vk::Format::eR32G32B32A32Sfloat,
-                    offsetof(Vertex, color)
-                )
             }
         };
         return attribute_descriptions;

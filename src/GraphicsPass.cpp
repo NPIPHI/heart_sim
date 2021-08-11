@@ -21,53 +21,30 @@ GraphicsPass::GraphicsPass(VmaAllocator allocator, vk::PhysicalDevice physical_d
     _queue = device.getQueue(queue_indices.graphics_family.value(), 0);
     _command_pool = device.createCommandPoolUnique({{}, queue_indices.graphics_family.value()});
 
-    std::array<vk::DescriptorSetLayoutBinding, 0> set_layout_bindings{};
-//    std::array<vk::DescriptorSetLayoutBinding, 2> set_layout_bindings{{
-//        {
-//            0,
-//            vk::DescriptorType::eUniformBuffer,
-//            1,
-//            vk::ShaderStageFlagBits::eVertex,
-//            nullptr
-//        },
-//        {
-//            1,
-//            vk::DescriptorType::eCombinedImageSampler,
-//            1,
-//            vk::ShaderStageFlagBits::eFragment,
-//            nullptr
-//        }
-//    }};
+    std::array<vk::DescriptorSetLayoutBinding, 1> set_layout_bindings{{
+        {
+            0,
+            vk::DescriptorType::eStorageBuffer,
+            1,
+            vk::ShaderStageFlagBits::eVertex,
+            nullptr
+        },
+    }};
     _descriptor_set_layout = device.createDescriptorSetLayoutUnique({{}, set_layout_bindings});
 
     std::array<vk::DescriptorPoolSize, 1> pool_sizes{{
-     {vk::DescriptorType::eUniformBuffer, 1}
+     {vk::DescriptorType::eStorageBuffer, 1}
     }};
     _depth_image = Image(allocator, _extent, vk::Format::eD32Sfloat, vk::ImageUsageFlagBits::eDepthStencilAttachment, vk::ImageAspectFlagBits::eDepth, VMA_MEMORY_USAGE_GPU_ONLY);
     _depth_image_view = _depth_image.create_view(_device);
     _descriptor_pool = device.createDescriptorPoolUnique(vk::DescriptorPoolCreateInfo{vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, 1, pool_sizes});
-    _descriptor_set = std::move(device.allocateDescriptorSetsUnique({*_descriptor_pool, *_descriptor_set_layout})[0]);
-
-
-//    vk::DescriptorBufferInfo buffer_info(
-//                _vertex_buffer.vkBuffer()
-//            )
-//    vk::WriteDescriptorSet desecriptor_writes[]{
-//        vk::WriteDescriptorSet{
-//            *_descriptor_set,
-//            0,
-//            0,
-//            1,
-//            vk::DescriptorType::eUniformBuffer,
-//            nullptr,
-//        }
-//    };
 
     vk::PushConstantRange push_constant_range(
             vk::ShaderStageFlagBits::eVertex,
             0,
             sizeof(glm::mat4)
             );
+
     vk::PipelineLayoutCreateInfo pipeline_layout_create_info(
             {},
             1,
@@ -338,5 +315,29 @@ void GraphicsPass::record_end_render(vk::CommandBuffer command_buffer) {
 
 void GraphicsPass::record_push_constants(vk::CommandBuffer command_buffer, void *data, size_t size) {
     command_buffer.pushConstants(*_pipeline_layout, vk::ShaderStageFlagBits::eVertex, 0, size, data);
+}
+
+void GraphicsPass::record_bind_descriptors(vk::CommandBuffer command_buffer, vk::DescriptorSet descriptor_set) {
+    command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *_pipeline_layout, 0, 1, &descriptor_set, 0, nullptr);
+}
+
+vk::UniqueDescriptorSet GraphicsPass::create_descriptor_set() {
+    return std::move(_device.allocateDescriptorSetsUnique({*_descriptor_pool, *_descriptor_set_layout})[0]);
+}
+
+void GraphicsPass::write_descriptor(vk::DescriptorSet descriptor_set, Buffer & node_state_buffer) {
+    auto buffer_info = node_state_buffer.buffer_info();
+    vk::WriteDescriptorSet descriptor_write(
+            descriptor_set,
+            0,
+            0,
+            1,
+            vk::DescriptorType::eStorageBuffer,
+            nullptr,
+            &buffer_info,
+            nullptr
+            );
+
+    _device.updateDescriptorSets(1, &descriptor_write, 0, nullptr);
 }
 

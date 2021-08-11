@@ -39,7 +39,7 @@ PresentPass::PresentPass(vk::PhysicalDevice physical_device, vk::Device device, 
     _device = device;
     _image_format = pick_present_format(physical_device, surface);
     _render_finished = device.createSemaphoreUnique({});
-    auto present_mode = vk::PresentModeKHR::eMailbox;
+    auto present_mode = vk::PresentModeKHR::eFifo;
     auto capabilites = physical_device.getSurfaceCapabilitiesKHR(surface);
     _extent = get_extent(capabilites, window);
 
@@ -96,14 +96,14 @@ PresentPass::make_present_image_views(vk::Device device, std::span<vk::Image> im
 }
 
 uint32_t PresentPass::get_next_image_index() {
-    _device.waitForFences(*_in_flight_fence, VK_TRUE, UINT64_MAX);
-    uint32_t index = _device.acquireNextImageKHR(*_swap_chain, UINT64_MAX, *_image_available);
+    (void)_device.waitForFences(*_in_flight_fence, VK_TRUE, UINT64_MAX);
+    uint32_t index = _device.acquireNextImageKHR(*_swap_chain, UINT64_MAX, *_image_available).value;
     return index;
 }
 
 vk::ImageView PresentPass::acquire_image(uint32_t index) {
     if(_images_in_flight_fences[index]){
-        _device.waitForFences(_images_in_flight_fences[index], VK_TRUE, UINT64_MAX);
+        (void)_device.waitForFences(_images_in_flight_fences[index], VK_TRUE, UINT64_MAX);
     }
     _images_in_flight_fences[index] = *_in_flight_fence;
     return *_image_views[index];
@@ -111,7 +111,7 @@ vk::ImageView PresentPass::acquire_image(uint32_t index) {
 
 std::vector<vk::ImageView> PresentPass::image_views() const{
     std::vector<vk::ImageView> image_views(_image_views.size());
-    for(int i = 0; i < _image_views.size(); i++){
+    for(size_t i = 0; i < _image_views.size(); i++){
         image_views[i] = *_image_views[i];
     }
     return image_views;
@@ -138,5 +138,5 @@ void PresentPass::present_image(uint32_t index) {
             &index
             );
 
-    _queue.presentKHR(present_info);
+    (void)_queue.presentKHR(present_info);
 }

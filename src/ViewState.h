@@ -15,14 +15,14 @@ public:
             start_y_pos(),
             cursor_x_pos(),
             cursor_y_pos(),
-            position()
+            position({0, 0, -100, 0})
     {}
     ViewState(double cursor_x_pos, double cursor_y_pos):
             start_x_pos(cursor_x_pos),
             start_y_pos(cursor_y_pos),
             cursor_x_pos(cursor_x_pos),
             cursor_y_pos(cursor_y_pos),
-            position()
+            position({0, 0, -100, 0})
     {}
     [[nodiscard]] glm::mat4 mvp(int viewport_width, int viewport_height) const {
         auto model = glm::translate(rotation(), glm::vec3(position));

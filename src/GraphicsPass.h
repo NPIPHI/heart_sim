@@ -20,10 +20,13 @@ public:
 
     void record_begin_render(vk::CommandBuffer command_buffer, vk::Framebuffer frame_buffer);
     void record_push_constants(vk::CommandBuffer command_buffer, void * data, size_t size);
+    void record_bind_descriptors(vk::CommandBuffer command_buffer, vk::DescriptorSet descriptor_set);
     void record_draw(vk::CommandBuffer command_buffer, Buffer const& vertex_buffer, size_t vertex_count);
     void record_draw_indexed(vk::CommandBuffer command_buffer, Buffer const& vertex_buffer, Buffer const& index_buffer, size_t index_count);
     void record_end_render(vk::CommandBuffer command_buffer);
+    void write_descriptor(vk::DescriptorSet descriptor_set, Buffer & node_state_buffer);
     vk::UniqueCommandBuffer create_command_buffer();
+    vk::UniqueDescriptorSet create_descriptor_set();
     vk::Framebuffer get_framebuffer(uint32_t index);
     vk::Queue queue(){
         return _queue;
@@ -41,7 +44,6 @@ private:
     vk::UniquePipelineLayout _pipeline_layout;
     vk::UniqueDescriptorPool _descriptor_pool;
     vk::UniqueDescriptorSetLayout _descriptor_set_layout;
-    vk::UniqueDescriptorSet _descriptor_set;
     vk::UniqueRenderPass _render_pass;
     vk::UniqueCommandPool _command_pool;
     vk::UniqueShaderModule _vert_shader, _frag_shader;

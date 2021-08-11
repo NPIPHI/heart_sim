@@ -64,9 +64,9 @@ vk::UniquePipeline ComputePass::create_compute_pipeline() {
 
 void ComputePass::record(vk::CommandBuffer command_buffer, Buffer &src, Buffer &dst, Buffer &edges) {
     assert(src.size() == dst.size());
-    vk::DescriptorBufferInfo src_info(src.vkBuffer(), 0, src.size());
-    vk::DescriptorBufferInfo dst_info(dst.vkBuffer(), 0, dst.size());
-    vk::DescriptorBufferInfo graph_info(edges.vkBuffer(), 0, edges.size());
+    auto src_info = src.buffer_info();
+    auto dst_info = dst.buffer_info();
+    auto graph_info = edges.buffer_info();
     vk::WriteDescriptorSet writes[]{
             {
                 *_descriptor_set,

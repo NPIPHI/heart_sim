@@ -27,8 +27,8 @@ public:
 private:
     static void cursor_pos_callback(GLFWwindow * window, double xpos, double ypos);
     void update_cursor_pos(double xpos, double ypos);
-    void draw_frame(Buffer &vertex_buffer);
-    void update_vertices(Buffer &src, Buffer &dst);
+    void draw_frame(Buffer &node_state_buffer);
+    void update_nodes(Buffer &src, Buffer &dst);
     int _width, _height;
     GLFWwindow * _window;
     vk::UniqueInstance _instance;
@@ -40,14 +40,13 @@ private:
     GraphicsPass _graphics;
     ComputePass _compute;
     ViewState _view_state;
-    NodeGraph _node_graph;
     Buffer _graph_buffer;
     vk::UniqueCommandBuffer _compute_command_buffer;
     size_t frame_count = 0;
 
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
-    Buffer vertex_buffer1, vertex_buffer2, index_buffer;
+    Buffer vertex_buffer, index_buffer, node_state_buffer1, node_state_buffer2;
 
     constexpr static std::array<const char *, 1> _logical_device_extensions = {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME

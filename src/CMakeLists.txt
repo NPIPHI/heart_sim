@@ -8,7 +8,7 @@ find_package(unofficial-vulkan-memory-allocator CONFIG REQUIRED)
 find_package(Boost 1.7 REQUIRED)
 find_package(CGAL CONFIG REQUIRED)
 
-add_executable(heart_sim main.cpp App.cpp App.h Buffer.h Image.h Vertex.h GraphicsPass.cpp GraphicsPass.h LoadAssets.cpp LoadAssets.h Utils.cpp Utils.h HeaderImpl.cpp VmaUniqueAllocator.h PresentPass.cpp PresentPass.h ViewState.h NodeGraph.cpp NodeGraph.h ComputePass.cpp ComputePass.h FillPoints.cpp FillPoints.h)
+add_executable(heart_sim main.cpp App.cpp App.h Buffer.h Image.h Vertex.h GraphicsPass.cpp GraphicsPass.h LoadAssets.cpp LoadAssets.h Utils.cpp Utils.h HeaderImpl.cpp VmaUniqueAllocator.h PresentPass.cpp PresentPass.h ViewState.h NodeGraph.cpp NodeGraph.h ComputePass.cpp ComputePass.h FillPoints.cpp FillPoints.h NodeState.h)
 
 add_custom_target(CompileShaders
         COMMAND ${CMAKE_SOURCE_DIR}/src/shaders/compile.bat)

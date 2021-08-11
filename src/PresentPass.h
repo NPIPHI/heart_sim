@@ -46,7 +46,6 @@ private:
     vk::Format _image_format;
     vk::Extent2D _extent;
     vk::Queue _queue;
-    size_t _current_frame{};
     vk::UniqueFence _in_flight_fence;
     std::vector<vk::Fence> _images_in_flight_fences;
     vk::UniqueSemaphore _image_available, _render_finished;

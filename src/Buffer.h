@@ -66,6 +66,9 @@ public:
     [[nodiscard]] size_t size() const {
         return _size;
     }
+    [[nodiscard]] vk::DescriptorBufferInfo buffer_info() const {
+        return {vkBuffer(), 0, size()};
+    }
 private:
     vk::Buffer _buffer{};
     VmaAllocation _allocation{};
