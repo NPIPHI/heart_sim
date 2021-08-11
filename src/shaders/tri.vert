@@ -20,6 +20,11 @@ layout(std430, binding = 0) buffer node_state_arr{
 void main() {
     gl_Position = mvp * in_position;
     gl_PointSize = 2.f;
-    frag_color = in_normal.xyz;
-    frag_color = vec3(node_states[gl_VertexIndex].activation, 0, 0.1);
+
+    float ambient = 0.5;
+    float direct = 0.5;
+    vec3 src_light = vec3(0.577, 0.577, 0.577);
+
+    float light = dot(in_normal.xyz, src_light) * direct + ambient;
+    frag_color = vec3(node_states[gl_VertexIndex].activation, 0, 0.1) * light;
 }

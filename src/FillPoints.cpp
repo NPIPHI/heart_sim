@@ -39,9 +39,10 @@ std::vector<glm::vec3> FillPoints::random_fill(std::span<Vertex> vertices, std::
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     std::uniform_real_distribution<float> dis(-0.6, 0.6);
-    for(float x = tree.bbox().xmin(); x < tree.bbox().xmax(); x+= 2){
-        for(float y = tree.bbox().ymin(); y < tree.bbox().ymax(); y += 2){
-            for(float z = tree.bbox().zmin(); z < tree.bbox().zmax(); z += 2){
+    constexpr float density = 1;
+    for(float x = tree.bbox().xmin(); x < tree.bbox().xmax(); x+= density){
+        for(float y = tree.bbox().ymin(); y < tree.bbox().ymax(); y += density){
+            for(float z = tree.bbox().zmin(); z < tree.bbox().zmax(); z += density){
                     float rx = x + dis(gen);
                     float ry = y + dis(gen);
                     float rz = z + dis(gen);
