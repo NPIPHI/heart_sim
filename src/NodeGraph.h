@@ -14,7 +14,7 @@ class NodeGraph {
 public:
     static constexpr int neighbor_count = 8;
     NodeGraph(){};
-    NodeGraph(std::span<const Vertex> vertices);
+    NodeGraph(std::span<glm::vec3> vertices);
 
     std::vector<std::array<uint32_t, neighbor_count>> edges;
 };

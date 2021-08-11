@@ -17,19 +17,19 @@ using point = bg::model::point<float, 3, bg::cs::cartesian>;
 using value = std::pair<point, uint32_t>;
 
 
-NodeGraph::NodeGraph(std::span<const Vertex> vertices) {
+NodeGraph::NodeGraph(std::span<glm::vec3> vertices) {
     edges.resize(vertices.size());
     auto t1 = std::chrono::steady_clock::now();
     bgi::rtree<value, bgi::quadratic<16>> tree;
     for(size_t i = 0; i < vertices.size(); i++){
-        auto v = vertices[i].pos;
+        auto v = vertices[i];
         point p = {v.x, v.y, v.z};
         tree.insert({p, i});
     }
 
 
     auto build = [&](size_t node){
-        auto v = vertices[node].pos;
+        auto v = vertices[node];
         point p{v.x, v.y, v.z};
         auto iter = tree.qbegin(bgi::nearest(p, neighbor_count + 1));
         //skip the point itself
