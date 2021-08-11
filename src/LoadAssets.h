@@ -11,7 +11,8 @@
 
 namespace LoadAssets {
     [[nodiscard]] std::vector<char> read_file(const char *file_name);
-    [[nodiscard]] std::tuple<uint32_t, uint32_t, std::vector<char>> read_image(const char *filename);
+    [[nodiscard]] std::tuple<uint32_t, uint32_t, std::vector<char>> read_image(const char *file_name);
+    [[nodiscard]] std::pair<std::vector<Vertex>, std::vector<uint32_t>> read_model(const char * file_name);
 };
 
 

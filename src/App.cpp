@@ -13,6 +13,7 @@
 #include "NodeGraph.h"
 #include "FillPoints.h"
 #include "NodeState.h"
+#include "LoadAssets.h"
 
 App::App(int width, int height) :
         _width(width),
@@ -37,32 +38,24 @@ App::App(int width, int height) :
 
     stl_reader::StlMesh<float, uint32_t> mesh("heart.stl");
 
+    std::tie(vertices, indices) = LoadAssets::read_model("heart.stl");
+
+
+
+    auto points = FillPoints::random_fill(vertices, indices);
     std::vector<glm::vec3> point_cloud;
-
-    for(size_t i = 0; i < mesh.num_vrts(); i++){
-        float x = mesh.raw_coords()[i*3];
-        float y = mesh.raw_coords()[i*3+1];
-        float z = mesh.raw_coords()[i*3+2];
-        float nx = mesh.raw_normals()[i*3];
-        float ny = mesh.raw_normals()[i*3+1];
-        float nz = mesh.raw_normals()[i*3+2];
-        vertices.push_back({{x,y,z,1}, {nx,ny,nz,0}});
-        point_cloud.push_back({x,y,z});
+    for(auto v : vertices){
+        point_cloud.push_back(v.position);
     }
-
-    for(size_t i = 0; i < mesh.num_tris(); i++){
-        indices.push_back(mesh.raw_tris()[i*3]);
-        indices.push_back(mesh.raw_tris()[i*3+1]);
-        indices.push_back(mesh.raw_tris()[i*3+2]);
-    }
-
-    auto points = FillPoints::random_fill(mesh);
     point_cloud.insert(point_cloud.end(), points.begin(),  points.end());
+
     std::cout << point_cloud.size() << " points" << std::endl;
+
 
     std::vector<NodeState> node_states(point_cloud.size(), NodeState{});
 
     auto node_graph = NodeGraph{point_cloud};
+
 
     _compute_command_buffer = _compute.create_command_buffer();
 

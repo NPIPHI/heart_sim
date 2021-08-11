@@ -5,11 +5,12 @@
 #ifndef HEART_SIM_FILLPOINTS_H
 #define HEART_SIM_FILLPOINTS_H
 
-#include <stl_reader.h>
+#include<span>
 #include <vector>
-#include <GLM/vec3.hpp>
+#include "Vertex.h"
+#include <glm/vec3.hpp>
 namespace FillPoints {
-    std::vector<glm::vec3> random_fill(stl_reader::StlMesh<float, uint32_t> const& mesh);
+    std::vector<glm::vec3> random_fill(std::span<Vertex> vertices, std::span<uint32_t> indices);
 };
 
 
