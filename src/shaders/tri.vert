@@ -26,5 +26,5 @@ void main() {
     vec3 src_light = vec3(0.577, 0.577, 0.577);
 
     float light = dot(in_normal.xyz, src_light) * direct + ambient;
-    frag_color = vec3(node_states[gl_VertexIndex].activation, 0, 0.1) * light;
+    frag_color = vec3(node_states[gl_VertexIndex].activation, 0, 0.5) * light;
 }

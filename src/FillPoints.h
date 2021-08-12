@@ -10,7 +10,7 @@
 #include "Vertex.h"
 #include <glm/vec3.hpp>
 namespace FillPoints {
-    std::vector<glm::vec3> random_fill(std::span<Vertex> vertices, std::span<uint32_t> indices);
+    std::vector<glm::vec3> random_fill(std::span<Vertex> vertices, std::span<uint32_t> indices, float density);
 };
 
 

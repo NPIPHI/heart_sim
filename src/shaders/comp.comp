@@ -44,7 +44,7 @@ void main()
     if(peaking && self.activation > 0.2){
         next.activation += 0.03;
     } else {
-        if(x == 0){
+        if(x < 10){
             next.activation += 0.002;
         } else {
             next.activation += 0.0005;

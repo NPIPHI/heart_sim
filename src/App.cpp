@@ -42,7 +42,7 @@ App::App(int width, int height) :
 
 
 
-    auto points = FillPoints::random_fill(vertices, indices);
+    auto points = FillPoints::random_fill(vertices, indices, 1);
     std::vector<glm::vec3> point_cloud;
     for(auto v : vertices){
         point_cloud.push_back(v.position);
@@ -51,11 +51,9 @@ App::App(int width, int height) :
 
     std::cout << point_cloud.size() << " points" << std::endl;
 
-
     std::vector<NodeState> node_states(point_cloud.size(), NodeState{});
 
     auto node_graph = NodeGraph{point_cloud};
-
 
     _compute_command_buffer = _compute.create_command_buffer();
 
@@ -101,6 +99,7 @@ void App::draw_frame(Buffer &node_state_buffer) {
     _graphics.record_push_constants(*command_buffer, &mvp, sizeof(mvp));
     _graphics.record_bind_descriptors(*command_buffer, *descriptor_set);
     _graphics.record_draw_indexed(*command_buffer, vertex_buffer, index_buffer, indices.size());
+//    _graphics.record_draw(*command_buffer, vertex_buffer, vertices.size());
     _graphics.record_end_render(*command_buffer);
     command_buffer->end();
 
