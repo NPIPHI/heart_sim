@@ -12,8 +12,6 @@
 #include<chrono>
 std::vector<glm::vec3> FillPoints::random_fill(std::span<Vertex> vertices, std::span<uint32_t> indices) {
     using K = CGAL::Simple_cartesian<float>;
-    using Ray = K::Ray_3;
-    using Line = K::Line_3;
     using Segment = K::Segment_3;
     using Point = K::Point_3;
     using Triangle = K::Triangle_3;
@@ -37,7 +35,7 @@ std::vector<glm::vec3> FillPoints::random_fill(std::span<Vertex> vertices, std::
     tree.build();
     std::vector<glm::vec3> points;
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::mt19937 gen{}; //Standard mersenne_twister_engine seeded with rd()
     std::uniform_real_distribution<float> dis(-0.6, 0.6);
     constexpr float density = 1;
     for(float x = tree.bbox().xmin(); x < tree.bbox().xmax(); x+= density){
