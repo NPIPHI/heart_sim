@@ -46,6 +46,7 @@ private:
 
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
+    size_t node_count;
     Buffer vertex_buffer, index_buffer, node_state_buffer1, node_state_buffer2;
 
     constexpr static std::array<const char *, 1> _logical_device_extensions = {
@@ -53,6 +54,7 @@ private:
     };
 #ifdef NDEBUG
     constexpr static std::array<const char *, 0> _validation_layers = {
+
     };
 #else
     constexpr static std::array<const char *, 2> _validation_layers = {{

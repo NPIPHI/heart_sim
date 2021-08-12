@@ -36,13 +36,12 @@ App::App(int width, int height) :
 
     glfwSetCursorPosCallback(_window, App::cursor_pos_callback);
 
-    stl_reader::StlMesh<float, uint32_t> mesh("heart.stl");
 
     std::tie(vertices, indices) = LoadAssets::read_model("heart.stl");
 
 
-
     auto points = FillPoints::random_fill(vertices, indices, 1);
+
     std::vector<glm::vec3> point_cloud;
     for(auto v : vertices){
         point_cloud.push_back(v.position);
@@ -54,10 +53,11 @@ App::App(int width, int height) :
     std::vector<NodeState> node_states(point_cloud.size(), NodeState{});
 
     auto node_graph = NodeGraph{point_cloud};
+    node_count = point_cloud.size();
 
     _compute_command_buffer = _compute.create_command_buffer();
 
-    vertex_buffer = {*_allocator, vertices.size() * sizeof(vertices[0]), vk::BufferUsageFlagBits::eUniformBuffer | vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eStorageBuffer, VMA_MEMORY_USAGE_GPU_ONLY};
+    vertex_buffer = {*_allocator, vertices.size() * sizeof(vertices[0]), vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer, VMA_MEMORY_USAGE_GPU_ONLY};
     index_buffer = {*_allocator, indices.size() * sizeof(indices[0]), vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, VMA_MEMORY_USAGE_GPU_ONLY};
     _graph_buffer = {*_allocator, node_graph.edges.size() * sizeof(node_graph.edges[0]), vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst, VMA_MEMORY_USAGE_GPU_ONLY};
     node_state_buffer1 = {*_allocator, node_states.size() * sizeof(node_states[0]), vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst, VMA_MEMORY_USAGE_GPU_ONLY};
@@ -167,7 +167,7 @@ void App::update_nodes(Buffer &src, Buffer &dst) {
     vk::CommandBufferBeginInfo begin_info{};
     command_buffer->begin(begin_info);
     _compute.record(*command_buffer, src, dst, _graph_buffer);
-    command_buffer->dispatch(vertices.size()/32+1, 1, 1);
+    command_buffer->dispatch(node_count/32+1, 1, 1);
     command_buffer->end();
     vk::SubmitInfo submit_info(
             0, nullptr,

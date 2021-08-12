@@ -8,6 +8,7 @@
 #include <CGAL/AABB_traits.h>
 #include <CGAL/AABB_triangle_primitive.h>
 #include<random>
+#include<thread>
 
 #include<chrono>
 std::vector<glm::vec3> FillPoints::random_fill(std::span<Vertex> vertices, std::span<uint32_t> indices, float density) {
@@ -33,23 +34,58 @@ std::vector<glm::vec3> FillPoints::random_fill(std::span<Vertex> vertices, std::
     auto t1 = std::chrono::steady_clock::now();
     Tree tree{triangles.begin(),  triangles.end()};
     tree.build();
+
+
+    std::vector<std::thread> thread_pool;
+    constexpr int thread_pool_size = 12;
+
+    std::mutex points_mutex;
     std::vector<glm::vec3> points;
-    std::random_device rd;  //Will be used to obtain a seed for the random number engine
-    std::mt19937 gen{}; //Standard mersenne_twister_engine seeded with rd()
-    std::uniform_real_distribution<float> dis(-0.6, 0.6);
-    for(float x = tree.bbox().xmin(); x < tree.bbox().xmax(); x+= density){
-        for(float y = tree.bbox().ymin(); y < tree.bbox().ymax(); y += density){
-            for(float z = tree.bbox().zmin(); z < tree.bbox().zmax(); z += density){
-                    float rx = x + dis(gen);
-                    float ry = y + dis(gen);
-                    float rz = z + dis(gen);
-                    Segment query{Point{rx,ry,rz}, Point{rx,ry, 10000}};
-                    if(tree.number_of_intersected_primitives(query) % 2 == 1){
-                        points.push_back({rx,ry,rz});
-                    };
+
+    for(int i = 0; i < thread_pool_size; i++){
+        float xdif = (tree.bbox().xmax() - tree.bbox().xmin())/thread_pool_size;
+        float xmin = tree.bbox().xmin() + xdif * i;
+        float xmax = xmin + xdif;
+        thread_pool.emplace_back([&, xmin, xmax]{
+            std::vector<glm::vec3> local_points;
+            std::random_device rd;  //Will be used to obtain a seed for the random number engine
+            std::mt19937 gen{}; //Standard mersenne_twister_engine seeded with rd()
+            std::uniform_real_distribution<float> dis(-0.6, 0.6);
+            for(float x = xmin; x < xmax; x+= density){
+                for(float y = tree.bbox().ymin(); y < tree.bbox().ymax(); y += density){
+                    for(float z = tree.bbox().zmin(); z < tree.bbox().zmax(); z += density){
+                        float rx = x + dis(gen);
+                        float ry = y + dis(gen);
+                        float rz = z + dis(gen);
+                        Segment query{Point{rx,ry,rz}, Point{rx,ry, 10000}};
+                        if(tree.number_of_intersected_primitives(query) % 2 == 1){
+                            local_points.push_back({rx,ry,rz});
+                        };
+                    }
+                }
             }
-        }
+            std::lock_guard<std::mutex> l(points_mutex);
+            points.insert(points.end(), local_points.begin(), local_points.end());
+        });
     }
+    for(auto & t : thread_pool){
+        t.join();
+    }
+//    for(float x = tree.bbox().xmin(); x < tree.bbox().xmax(); x+= density){
+//        for(float y = tree.bbox().ymin(); y < tree.bbox().ymax(); y += density){
+//            for(float z = tree.bbox().zmin(); z < tree.bbox().zmax(); z += density){
+//                    float rx = x + dis(gen);
+//                    float ry = y + dis(gen);
+//                    float rz = z + dis(gen);
+//                    Segment query{Point{rx,ry,rz}, Point{rx,ry, 10000}};
+//                    if(tree.number_of_intersected_primitives(query) % 2 == 1){
+//                        points.push_back({rx,ry,rz});
+//                    };
+//            }
+//        }
+//    }
+
+
     auto t2 = std::chrono::steady_clock::now();
     std::cout << (t2-t1)/std::chrono::microseconds(1) << ":us gen points\n";
     return points;

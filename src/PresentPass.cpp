@@ -39,7 +39,7 @@ PresentPass::PresentPass(vk::PhysicalDevice physical_device, vk::Device device, 
     _device = device;
     _image_format = pick_present_format(physical_device, surface);
     _render_finished = device.createSemaphoreUnique({});
-    auto present_mode = vk::PresentModeKHR::eFifo;
+    auto present_mode = vk::PresentModeKHR::eMailbox;
     auto capabilites = physical_device.getSurfaceCapabilitiesKHR(surface);
     _extent = get_extent(capabilites, window);
 
