@@ -7,9 +7,6 @@
 #include<iostream>
 #include<stl_reader.h>
 #include<algorithm>
-#define GLM_FORCE_RADIANS
-#include<glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp>
 #include "NodeGraph.h"
 #include "FillPoints.h"
 #include "NodeState.h"

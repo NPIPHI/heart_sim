@@ -43,7 +43,7 @@ NodeGraph::NodeGraph(std::span<glm::vec3> vertices) {
 
 
     auto t2 = std::chrono::steady_clock::now();
-    constexpr size_t thread_pool_size = 12;
+    size_t thread_pool_size = std::thread::hardware_concurrency();
     std::vector<std::thread> thread_pool;
     size_t step = vertices.size() / thread_pool_size;
     for(size_t i = 0; i < thread_pool_size; i++){

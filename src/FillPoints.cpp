@@ -37,12 +37,11 @@ std::vector<glm::vec3> FillPoints::random_fill(std::span<Vertex> vertices, std::
 
 
     std::vector<std::thread> thread_pool;
-    constexpr int thread_pool_size = 12;
-
+    size_t thread_pool_size = std::thread::hardware_concurrency();
     std::mutex points_mutex;
     std::vector<glm::vec3> points;
 
-    for(int i = 0; i < thread_pool_size; i++){
+    for(size_t i = 0; i < thread_pool_size; i++){
         float xdif = (tree.bbox().xmax() - tree.bbox().xmin())/thread_pool_size;
         float xmin = tree.bbox().xmin() + xdif * i;
         float xmax = xmin + xdif;
