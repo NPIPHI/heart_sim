@@ -209,6 +209,7 @@ vk::UniqueRenderPass GraphicsPass::make_render_pass(vk::Device device, vk::Forma
     subpass.pColorAttachments = &color_attachment_ref;
     subpass.pDepthStencilAttachment = &depth_attachment_ref;
 
+//
     vk::SubpassDependency dependency(
             VK_SUBPASS_EXTERNAL,
             0,
@@ -218,15 +219,6 @@ vk::UniqueRenderPass GraphicsPass::make_render_pass(vk::Device device, vk::Forma
             vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite,
             {}
             );
-//
-//    VkSubpassDependency dependency{
-//            .srcSubpass = VK_SUBPASS_EXTERNAL,
-//            .dstSubpass = 0,
-//            .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-//            .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-//            .srcAccessMask = 0,
-//            .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
-//    };
 
     vk::AttachmentDescription attachments[] = {color_attachment, depth_attachment};
 
